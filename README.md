@@ -4,12 +4,12 @@
 ![Authentication and Authorization in Kubeflow](assets/auth-istio.png)
 
 
-## Create SLL Certificates
+## Create SSL Certificates
 
-This example is going to need three domains:  
+This example is going to require three domains:  
 - dex.example.org: For the authentication server
-- login.example.org: For the client application for authentication
-- ldap-admin.example.org: For the admin interface to create LDAP users and groups
+- login.example.org: For the client application for authentication through dex (optional)
+- ldap-admin.example.org: For the admin interface to create LDAP users and groups (optional)
 
 **Note**: Replace *example.org* with your own domain.  
 
@@ -25,4 +25,12 @@ Please generate certificates with a trusted authority for enabling this example 
 
 ## Authentication Server Setup
 
- Fill in Kustomize with overlays for certs and values.
+### Setup Post Certificate Creation
+
+`kubectl create secret tls dex.example.com.tls --cert=ssl/cert.pem --key=ssl/key.pem -n auth`
+
+Replace `dex.example.com.tls` with your own domain.
+
+### Editing Overlay File Values
+
+Follow instructions [here](overlays/README.md) to edit Kustomize overlays in `overlays/prototype` to setup a Dex server with LDAP IdP and a client application (dex-k8s-authenticator) for issuing keys for Dex.
