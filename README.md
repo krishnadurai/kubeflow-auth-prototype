@@ -1,5 +1,7 @@
 # Kubeflow Authentication and Authorization Prototype
 
+**Note**: This setup assumes Kubeflow Pipelines is setup in namespace kubeflow and Istio is already setup in the Kubernetes cluster.
+
 ## High Level Diagram
 ![Authentication and Authorization in Kubeflow](assets/auth-istio.png)
 
@@ -35,8 +37,60 @@ Replace `dex.example.com.tls` with your own domain.
 
 ### Editing Overlay File Values
 
-Follow instructions [here](overlays/README.md) to edit Kustomize overlays in `overlays/prototype` to setup a Dex server with LDAP IdP and a client application (dex-k8s-authenticator) for issuing keys for Dex.
+Follow instructions [here](authentication/overlays/README.md) to edit Kustomize overlays in `authentication/overlays/prototype` to setup a Dex server with LDAP IdP and a client application (dex-k8s-authenticator) for issuing keys for Dex.
 
 ### Apply Kustomize Configs
 
-`kustomize build overlays/prototype | kubectl apply -f -`
+`kustomize build authentication/overlays/prototype | kubectl apply -f -`
+
+## Create Users and Groups in LDAP server
+
+## Setup Kubernetes OIDC Authentication
+
+The following parameters need to be set in Kubernetes API Server configuration file usually found in: `/etc/kubernetes/manifests/kube-apiserver.yaml`.
+
+- --oidc-issuer-url=https://dex.example.org:32000
+- --oidc-client-id=ldapdexapp
+- --oidc-ca-file=/etc/ssl/certs/openid-ca.pem
+- --oidc-username-claim=email
+- --oidc-groups-claim=groups
+
+`oidc-ca-file` needs to have the path to the file containing the certificate authority for the dex server's domain: dex.example.com.
+
+Refer [official documentation](https://kubernetes.io/docs/reference/access-authn-authz/authentication/#configuring-the-api-server) for meanings of these parameters.
+
+When you have added these flags, Kubernetes should restart kube-apiserver pod. If not, run this command: `sudo systemctl restart kubelet` in your Kubernetes API Server master node. You can check flags in the pod description:
+
+`kubectl describe pod kube-apiserver -n kube-system`
+
+## Setup Kubernetes RBAC
+
+```
+cd authorization/Kubernetes
+kubectl create -f .
+```
+
+## Setup Istio Authentication Policy and RBAC
+
+Currently, the only service authenticated and authorized supported is ml-pipeline service.
+This example allows for authentication and authorization only for requests within the Kubernetes cluster. Istio version 1.3 will allow for application of RBAC rules to ingress requests to the cluster.
+
+### Istio Authentication
+
+```
+cd authentication/Istio
+```
+
+Edit the file `authentication_policy.yaml` and replace the value for 'dex.example.org' in `issuer` and `jwksUri` with your dex server's domain.
+
+```
+kubectl create -f authentication_policy.yaml
+cd ../..
+```
+
+### Istio RBAC Authorization
+```
+cd authorization/Istio
+kubectl create -f .
+cd ../..
+```
