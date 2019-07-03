@@ -5,10 +5,11 @@ metadata:
   labels:
     app: dex-k8s-authenticator
 spec:
-  type: ClusterIP
+  type: NodePort
   ports:
   - port: 5555
-    targetPort: http
+    targetPort: 5555
+    nodePort: 32002
     protocol: TCP
     name: http
   selector:

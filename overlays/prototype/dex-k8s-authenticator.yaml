@@ -16,7 +16,7 @@ data:
         # Redirect Url pointing to dex-k8s-authenticator callback for this cluster
         # This should be configured in Dex as part of the staticClients
         # redirectURIs option
-        redirect_uri: https://login.example.com/callback/onprem-cluster
+        redirect_uri: https://login.example.com:5555/callback/onprem-cluster
 
         # Client Secret - should match value in Dex
         client_secret: pUBnBOY80SnXgjibTYM9ZWNzY2xreNGQok

@@ -27,6 +27,8 @@ Please generate certificates with a trusted authority for enabling this example 
 
 ### Setup Post Certificate Creation
 
+`kubectl create ns auth`
+
 `kubectl create secret tls dex.example.com.tls --cert=ssl/cert.pem --key=ssl/key.pem -n auth`
 
 Replace `dex.example.com.tls` with your own domain.
@@ -34,3 +36,7 @@ Replace `dex.example.com.tls` with your own domain.
 ### Editing Overlay File Values
 
 Follow instructions [here](overlays/README.md) to edit Kustomize overlays in `overlays/prototype` to setup a Dex server with LDAP IdP and a client application (dex-k8s-authenticator) for issuing keys for Dex.
+
+### Apply Kustomize Configs
+
+`kustomize build overlays/prototype | kubectl apply -f -`

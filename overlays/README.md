@@ -17,6 +17,7 @@ Replace `dex.example.com.tls` with your own secret as created during certificate
 #### In data:config.yaml
 
 - `issuer` needs to be set to your own domain for dex server
+- `connectors`: Within the element with *type: ldap* change the paramter *config:host* to the domain or IP of the LDAP server. For eg. ldap.auth.svc.cluster.local:389
 - `staticClients`: *id* and *secret* can be modified to a different value, this should be reflected in the client application configuration. *redirectURIs* needs to be set to your own domain for client application for dex.
 
 ## dex-k8s-authenticator.yaml
@@ -25,7 +26,7 @@ Replace `dex.example.com.tls` with your own secret as created during certificate
 
 - `cluster` has these following values to be set
   - *name* to an appropriate name for your Kubernetes cluster
-  - *redirect_uri, client_secret and issuer* need to be set as the same as mentioned in dex configMap.
+  - *redirect_uri, client_secret and issuer* need to be set as the same as mentioned in dex configMap staticClients.
   - *k8s_master_uri* needs to be set to the Kubernetes API server URI.
   - *k8s_ca_pem* needs to be populated with the Kubernetes CA cert file contents obtained by  
   `kubectl config view --raw -o json | jq -r '.clusters[0].cluster."certificate-authority-data"' | tr -d '"' | base64 --decode`  
