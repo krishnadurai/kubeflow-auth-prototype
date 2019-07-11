@@ -94,3 +94,40 @@ cd authorization/Istio
 kubectl create -f .
 cd ../..
 ```
+
+## Work-around: A way to use Self-Signed Certificates
+
+* Change the following three entries in *[alt_names]* section in `certs/gencert.sh` file to reflect your own domains:
+  * dex.example.org
+  * login.example.org
+  * ldap-admin.example.org
+
+
+* Execute `certs/gencert.sh` on your terminal and it should create a folder `ssl` containing all required self signed certificates.
+
+* Copy the JWKS keys from `https://dex.example.com/keys` and host these keys in a public repository as a file. This public repository should have a verified a https SSL certificate (for e.g. github).
+
+* Copy the file url from the public repository in the `jwksUri` field of Istio Authentication Policy config:
+
+```
+apiVersion: "authentication.istio.io/v1alpha1"
+kind: "Policy"
+metadata:
+  name: "pipelines-auth-policy"
+spec:
+  targets:
+  - name: ml-pipeline
+  peers:
+  - mtls: {}
+  origins:
+  - jwt:
+      audiences:
+        - "ldapdexapp"
+      issuer: "https://org.example.com:32000"
+      jwksUri: "https://raw.githubusercontent.com/example-organisation/jwks/master/auth-jwks.json"
+  principalBinding: USE_ORIGIN
+  targets:
+  - name: ml-pipeline
+```
+
+* Note that this is just a work around and JWKS keys are rotated by the Authentication Server. These JWKS keys will become invalid after the rotation period and you will have to re-upload the new keys back to your public repository.
