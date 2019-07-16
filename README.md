@@ -45,6 +45,8 @@ Follow instructions [here](authentication/overlays/README.md) to edit Kustomize 
 
 ## Create Users and Groups in LDAP server
 
+Follow instructions [here](authentication/base/ldap/README.md).
+
 ## Setup Kubernetes OIDC Authentication
 
 The following parameters need to be set in Kubernetes API Server configuration file usually found in: `/etc/kubernetes/manifests/kube-apiserver.yaml`.
