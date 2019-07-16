@@ -33,7 +33,7 @@ Create three generic user accounts:
 
 Now the LDAP tree on your screen’s left pane should appear like the following image:
 
-![LDAP Object Tree](../../../assets/ldap_tree.png =250x400)
+![LDAP Object Tree](../../../assets/ldap_tree.png)
 
 
 While creating each user account, you need to ensure two additional steps:
